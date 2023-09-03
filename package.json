@@ -1,0 +1,22 @@
+{
+  "name": "study_node",
+  "version": "1.0.0",
+  "description": "Node.js 기초 스터디",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mjun0328/Study_Node.js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/mjun0328/Study_Node.js#readme",
+  "dependencies": {
+    "sanitize-html": "^2.11.0"
+  }
+}
