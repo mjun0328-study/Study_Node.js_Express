@@ -105,10 +105,13 @@ var app = http.createServer(function (request, response) {
     });
     request.on("end", function () {
       var post = qs.parse(body);
-      console.log(post.title);
+      var title = post.title;
+      var description = post.description;
+      fs.writeFile(`data/${title}`, description, "utf8", function (err) {
+        response.writeHead(302, { Location: `/?id=${title}` });
+        response.end("Success");
+      });
     });
-    response.writeHead(200);
-    response.end("Success");
   } else {
     response.writeHead(404);
     response.end("Not Found");
