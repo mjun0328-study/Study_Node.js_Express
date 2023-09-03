@@ -2,6 +2,7 @@ var http = require("http");
 var fs = require("fs");
 var url = require("url");
 var qs = require("querystring");
+var path = require("path");
 
 var template = require("./lib/template.js");
 
@@ -30,9 +31,10 @@ var app = http.createServer(function (request, response) {
       });
     } else {
       fs.readdir("./data/", function (error, filelist) {
+        var filteredPath = path.parse(queryData.id).base;
         var list = template.list(filelist);
         fs.readFile(
-          `data/${queryData.id}`,
+          `data/${filteredPath}`,
           "utf8",
           function (err, description) {
             var title = queryData.id;
@@ -88,17 +90,23 @@ var app = http.createServer(function (request, response) {
     });
     request.on("end", function () {
       var post = qs.parse(body);
-      var title = post.title;
+      var filteredTitle = path.parse(post.title).base;
       var description = post.description;
-      fs.writeFile(`data/${title}`, description, "utf8", function (err) {
-        response.writeHead(302, { Location: `/?id=${title}` });
-        response.end("Success");
-      });
+      fs.writeFile(
+        `data/${filteredTitle}`,
+        description,
+        "utf8",
+        function (err) {
+          response.writeHead(302, { Location: `/?id=${filteredTitle}` });
+          response.end("Success");
+        }
+      );
     });
   } else if (pathname === "/update") {
     fs.readdir("./data/", function (error, filelist) {
+      var filteredPath = path.parse(queryData.id).base;
       var list = template.list(filelist);
-      fs.readFile(`data/${queryData.id}`, "utf8", function (err, description) {
+      fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
         var title = queryData.id;
         var html = template.HTML(
           title,
@@ -128,14 +136,19 @@ var app = http.createServer(function (request, response) {
     });
     request.on("end", function () {
       var post = qs.parse(body);
-      var id = post.id;
-      var title = post.title;
+      var filteredId = path.parse(post.id).base;
+      var filteredTitle = path.parse(post.title).base;
       var description = post.description;
-      fs.rename(`data/${id}`, `data/${title}`, function () {
-        fs.writeFile(`data/${title}`, description, "utf8", function (err) {
-          response.writeHead(302, { Location: `/?id=${title}` });
-          response.end();
-        });
+      fs.rename(`data/${filteredId}`, `data/${filteredTitle}`, function () {
+        fs.writeFile(
+          `data/${filteredTitle}`,
+          description,
+          "utf8",
+          function (err) {
+            response.writeHead(302, { Location: `/?id=${filteredTitle}` });
+            response.end();
+          }
+        );
       });
     });
   } else if (pathname === "/delete_process") {
@@ -146,7 +159,8 @@ var app = http.createServer(function (request, response) {
     request.on("end", function () {
       var post = qs.parse(body);
       var id = post.id;
-      fs.unlink(`data/${id}`, function () {
+      var filteredId = path.parse(post.id).base;
+      fs.unlink(`data/${filteredId}`, function () {
         response.writeHead(302, { Location: `/` });
         response.end();
       });
