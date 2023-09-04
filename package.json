@@ -17,6 +17,7 @@
   "license": "ISC",
   "homepage": "https://github.com/mjun0328/Study_Node.js#readme",
   "dependencies": {
+    "express": "^4.18.2",
     "sanitize-html": "^2.11.0"
   }
 }
