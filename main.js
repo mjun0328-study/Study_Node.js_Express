@@ -11,43 +11,46 @@ const compression = require("compression");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(compression());
+app.get("*", (req, res, next) => {
+  fs.readdir("./data/", function (error, filelist) {
+    req.list = filelist;
+    next();
+  });
+});
 
 app.get("/", (req, res) => {
-  fs.readdir("./data/", function (error, filelist) {
-    var title = "Welcome";
-    var description = "Hello, Node.js";
-    var list = template.list(filelist);
+  var title = "Welcome";
+  var description = "Hello, Node.js";
+  var list = template.list(req.list);
+  var html = template.HTML(
+    title,
+    list,
+    `
+        <h2>${title}</h2>
+        <p>${description}</p>
+      `,
+    `<a href="/create">create</a>`
+  );
+  res.send(html);
+});
+
+app.get("/page/:pageId", (req, res) => {
+  var filteredPath = path.parse(req.params.pageId).base;
+  fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
+    var title = req.params.pageId;
+    var sanitizedTitle = sanitizeHtml(title);
+    var sanitizedDescription = sanitizeHtml(description, {
+      allowedTags: ["h1"],
+    });
+    var list = template.list(req.list);
     var html = template.HTML(
       title,
       list,
       `
-        <h2>${title}</h2>
-        <p>${description}</p>
-      `,
-      `<a href="/create">create</a>`
-    );
-    res.send(html);
-  });
-});
-
-app.get("/page/:pageId", (req, res) => {
-  fs.readdir("./data/", function (error, filelist) {
-    var filteredPath = path.parse(req.params.pageId).base;
-    var list = template.list(filelist);
-    fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
-      var title = req.params.pageId;
-      var sanitizedTitle = sanitizeHtml(title);
-      var sanitizedDescription = sanitizeHtml(description, {
-        allowedTags: ["h1"],
-      });
-      var html = template.HTML(
-        title,
-        list,
-        `
           <h2>${sanitizedTitle}</h2>
           <p>${sanitizedDescription}</p>
         `,
-        `
+      `
           <a href="/create">create</a>
           <a href="/update/${sanitizedTitle}">update</a>
           <form action="/delete_process" method="post">
@@ -55,20 +58,18 @@ app.get("/page/:pageId", (req, res) => {
             <input type="submit" value="delete">
           </form>
         `
-      );
-      res.send(html);
-    });
+    );
+    res.send(html);
   });
 });
 
 app.get("/create", (req, res) => {
-  fs.readdir("./data/", function (error, filelist) {
-    var title = "WEB - create";
-    var list = template.list(filelist);
-    var html = template.HTML(
-      title,
-      list,
-      `
+  var title = "WEB - create";
+  var list = template.list(req.list);
+  var html = template.HTML(
+    title,
+    list,
+    `
         <form action="/create_process" method="post">
           <p><input type="text" name="title" placeholder="title"></p>
           <p>
@@ -79,10 +80,9 @@ app.get("/create", (req, res) => {
           </p>
         </form>
       `,
-      ""
-    );
-    res.send(html);
-  });
+    ""
+  );
+  res.send(html);
 });
 
 app.post("/create_process", (req, res) => {
@@ -110,15 +110,14 @@ app.post("/create_process", (req, res) => {
 });
 
 app.get("/update/:pageId", (req, res) => {
-  fs.readdir("./data/", function (error, filelist) {
-    var filteredPath = path.parse(req.params.pageId).base;
-    var list = template.list(filelist);
-    fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
-      var title = req.params.pageId;
-      var html = template.HTML(
-        title,
-        list,
-        `
+  var filteredPath = path.parse(req.params.pageId).base;
+  var list = template.list(req.list);
+  fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
+    var title = req.params.pageId;
+    var html = template.HTML(
+      title,
+      list,
+      `
           <form action="/update_process" method="post">
             <input type="hidden" name="id" value="${title}">
             <p><input type="text" name="title" placeholder="title" value="${title}"></p>
@@ -130,11 +129,10 @@ app.get("/update/:pageId", (req, res) => {
             </p>
           </form>
         `,
-        `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
-      );
-      res.writeHead(200);
-      res.end(html);
-    });
+      `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+    );
+    res.writeHead(200);
+    res.end(html);
   });
 });
 
