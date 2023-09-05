@@ -9,6 +9,7 @@ const qs = require("querystring");
 const bodyParser = require("body-parser");
 const compression = require("compression");
 
+app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(compression());
 app.get("*", (req, res, next) => {
@@ -26,9 +27,10 @@ app.get("/", (req, res) => {
     title,
     list,
     `
-        <h2>${title}</h2>
-        <p>${description}</p>
-      `,
+      <h2>${title}</h2>
+      <p>${description}</p>
+      <img src="/images/park.jpg" style="width: 300px; display: block;">
+    `,
     `<a href="/create">create</a>`
   );
   res.send(html);
