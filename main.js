@@ -31,12 +31,83 @@ app.get("/", (req, res) => {
       <p>${description}</p>
       <img src="/images/park.jpg" style="width: 300px; display: block;">
     `,
-    `<a href="/create">create</a>`
+    `<a href="/topic/create">create</a>`
   );
   res.send(html);
 });
 
-app.get("/page/:pageId", (req, res, next) => {
+app.get("/topic/create", (req, res) => {
+  var title = "WEB - create";
+  var list = template.list(req.list);
+  var html = template.HTML(
+    title,
+    list,
+    `
+        <form action="/topic/create_process" method="post">
+          <p><input type="text" name="title" placeholder="title"></p>
+          <p>
+            <textarea name="description" placeholder="description"></textarea>
+          </p>
+          <p>
+            <input type="submit">
+          </p>
+        </form>
+      `,
+    ""
+  );
+  res.send(html);
+});
+
+app.post("/topic/create_process", (req, res) => {
+  var post = req.body;
+  var filteredTitle = path.parse(post.title).base;
+  var description = post.description;
+  fs.writeFile(`data/${filteredTitle}`, description, "utf8", function (err) {
+    res.writeHead(302, { Location: `/topic/${filteredTitle}` });
+    res.end("Success");
+  });
+});
+
+app.get("/topic/update/:pageId", (req, res) => {
+  var filteredPath = path.parse(req.params.pageId).base;
+  var list = template.list(req.list);
+  fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
+    var title = req.params.pageId;
+    var html = template.HTML(
+      title,
+      list,
+      `
+        <form action="/topic/update_process" method="post">
+          <input type="hidden" name="id" value="${title}">
+          <p><input type="text" name="title" placeholder="title" value="${title}"></p>
+          <p>
+            <textarea name="description" placeholder="description">${description}</textarea>
+          </p>
+          <p>
+            <input type="submit">
+          </p>
+        </form>
+      `,
+      `<a href="/topic/create">create</a> <a href="/topic/update?id=${title}">update</a>`
+    );
+    res.writeHead(200);
+    res.end(html);
+  });
+});
+
+app.post("/topic/update_process", (req, res) => {
+  var post = req.body;
+  var filteredId = path.parse(post.id).base;
+  var filteredTitle = path.parse(post.title).base;
+  var description = post.description;
+  fs.rename(`data/${filteredId}`, `data/${filteredTitle}`, function () {
+    fs.writeFile(`data/${filteredTitle}`, description, "utf8", function (err) {
+      res.redirect(`/topic/${filteredTitle}`);
+    });
+  });
+});
+
+app.get("/topic/:pageId", (req, res, next) => {
   var filteredPath = path.parse(req.params.pageId).base;
   fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
     if (err) {
@@ -52,113 +123,20 @@ app.get("/page/:pageId", (req, res, next) => {
         title,
         list,
         `
-            <h2>${sanitizedTitle}</h2>
-            <p>${sanitizedDescription}</p>
-          `,
+          <h2>${sanitizedTitle}</h2>
+          <p>${sanitizedDescription}</p>
+        `,
         `
-            <a href="/create">create</a>
-            <a href="/update/${sanitizedTitle}">update</a>
-            <form action="/delete_process" method="post">
-              <input type="hidden" name="id" value="${sanitizedTitle}">
-              <input type="submit" value="delete">
-            </form>
-          `
+          <a href="/topic/create">create</a>
+          <a href="/topic/update/${sanitizedTitle}">update</a>
+          <form action="/topic/delete_process" method="post">
+            <input type="hidden" name="id" value="${sanitizedTitle}">
+            <input type="submit" value="delete">
+          </form>
+        `
       );
       res.send(html);
     }
-  });
-});
-
-app.get("/create", (req, res) => {
-  var title = "WEB - create";
-  var list = template.list(req.list);
-  var html = template.HTML(
-    title,
-    list,
-    `
-        <form action="/create_process" method="post">
-          <p><input type="text" name="title" placeholder="title"></p>
-          <p>
-            <textarea name="description" placeholder="description"></textarea>
-          </p>
-          <p>
-            <input type="submit">
-          </p>
-        </form>
-      `,
-    ""
-  );
-  res.send(html);
-});
-
-app.post("/create_process", (req, res) => {
-  // var body = "";
-  // req.on("data", function (data) {
-  //   body = body + data;
-  // });
-  // req.on("end", function () {
-  //   var post = qs.parse(body);
-  //   var filteredTitle = path.parse(post.title).base;
-  //   var description = post.description;
-  //   fs.writeFile(`data/${filteredTitle}`, description, "utf8", function (err) {
-  //     res.writeHead(302, { Location: `/page/${filteredTitle}` });
-  //     res.end("Success");
-  //   });
-  // });
-
-  var post = req.body;
-  var filteredTitle = path.parse(post.title).base;
-  var description = post.description;
-  fs.writeFile(`data/${filteredTitle}`, description, "utf8", function (err) {
-    res.writeHead(302, { Location: `/page/${filteredTitle}` });
-    res.end("Success");
-  });
-});
-
-app.get("/update/:pageId", (req, res) => {
-  var filteredPath = path.parse(req.params.pageId).base;
-  var list = template.list(req.list);
-  fs.readFile(`data/${filteredPath}`, "utf8", function (err, description) {
-    var title = req.params.pageId;
-    var html = template.HTML(
-      title,
-      list,
-      `
-          <form action="/update_process" method="post">
-            <input type="hidden" name="id" value="${title}">
-            <p><input type="text" name="title" placeholder="title" value="${title}"></p>
-            <p>
-              <textarea name="description" placeholder="description">${description}</textarea>
-            </p>
-            <p>
-              <input type="submit">
-            </p>
-          </form>
-        `,
-      `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
-    );
-    res.writeHead(200);
-    res.end(html);
-  });
-});
-
-app.post("/update_process", (req, res) => {
-  var post = req.body;
-  var filteredId = path.parse(post.id).base;
-  var filteredTitle = path.parse(post.title).base;
-  var description = post.description;
-  fs.rename(`data/${filteredId}`, `data/${filteredTitle}`, function () {
-    fs.writeFile(`data/${filteredTitle}`, description, "utf8", function (err) {
-      res.redirect(`/page/${filteredTitle}`);
-    });
-  });
-});
-
-app.post("/delete_process", (req, res) => {
-  var post = req.body;
-  var filteredId = path.parse(post.id).base;
-  fs.unlink(`data/${filteredId}`, function () {
-    res.redirect("/");
   });
 });
 
