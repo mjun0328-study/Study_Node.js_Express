@@ -1,5 +1,11 @@
-extends layout
-
-block content
-  h1= title
-  p Welcome to #{title}
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    //- script(src="/javascripts/script.js") 
+  body
+    form(action="./sign" method="post")
+      input(type="text" placeholder="이름" name="name" autocomplete="off" value="#{name}")
+      input(type="number" placeholder="학번" name="sid" autocomplete="off" value="#{sid}")
+      button(type="submit") Sign
