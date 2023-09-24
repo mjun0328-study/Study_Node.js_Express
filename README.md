@@ -8,6 +8,8 @@ Node.js 활용 스터디
 
 - mySQL
 
+- Cookie & Auth
+
 ---
 
 23.9.1. ~
@@ -17,3 +19,5 @@ https://opentutorials.org/module/3549
 https://opentutorials.org/module/3590
 
 https://opentutorials.org/course/3347
+
+https://opentutorials.org/course/3387
