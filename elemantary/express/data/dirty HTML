@@ -1,2 +1,0 @@
-<h1>This is Dirty</h1>
-<script>alert("XSS")</script>
