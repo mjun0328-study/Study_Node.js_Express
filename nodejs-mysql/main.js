@@ -118,7 +118,7 @@ var app = http.createServer(function (request, response) {
             list,
             `
             <form action="/update_process" method="post">
-              <input type="hidden" name="id" value="${topic[0].title}">
+              <input type="hidden" name="id" value="${topic[0].id}">
               <p><input type="text" name="title" placeholder="title" value="${topic[0].title}"></p>
               <p>
                 <textarea name="description" placeholder="description">${topic[0].description}</textarea>
@@ -145,12 +145,15 @@ var app = http.createServer(function (request, response) {
       var id = post.id;
       var title = post.title;
       var description = post.description;
-      fs.rename(`data/${id}`, `data/${title}`, function (error) {
-        fs.writeFile(`data/${title}`, description, "utf8", function (err) {
-          response.writeHead(302, { Location: `/?id=${title}` });
+      db.query(
+        `UPDATE topic SET title=?, description=? WHERE id=?`,
+        [title, description, id],
+        function (error, results) {
+          if (error) throw error;
+          response.writeHead(302, { Location: `/?id=${id}` });
           response.end();
-        });
-      });
+        }
+      );
     });
   } else if (pathname === "/delete_process") {
     var body = "";
