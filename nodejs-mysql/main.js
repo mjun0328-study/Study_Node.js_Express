@@ -45,7 +45,9 @@ var app = http.createServer(function (request, response) {
             var html = template.HTML(
               topic[0].title,
               list,
-              `<h2>${topic[0].title}</h2>${topic[0].description}`,
+              `<h2>${sanitizeHtml(topic[0].title)}</h2>${sanitizeHtml(
+                topic[0].description
+              )}`,
               `
                 <a href="/create">create</a>
                 <a href="/update?id=${queryData.id}">update</a>
