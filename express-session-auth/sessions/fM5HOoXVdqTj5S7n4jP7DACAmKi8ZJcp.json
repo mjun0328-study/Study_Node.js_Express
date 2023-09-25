@@ -1,11 +1,1 @@
-{
-  "cookie": {
-    "originalMaxAge": null,
-    "expires": null,
-    "httpOnly": true,
-    "path": "/"
-  },
-  "__lastAccess": 1695653739700,
-  "is_logined": true,
-  "nickname": "mjun0328"
-}
+{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"__lastAccess":1695654141468,"is_logined":true,"nickname":"mjun0328"}
