@@ -5,6 +5,12 @@ var fs = require("fs");
 var sanitizeHtml = require("sanitize-html");
 var template = require("../lib/template.js");
 
+var authData = {
+  email: "swmjoon@gmail.com",
+  password: "12345",
+  nickname: "mjun0328",
+};
+
 router.get("/login", function (request, response) {
   var title = "WEB - login";
   var list = template.list(request.list);
@@ -23,6 +29,17 @@ router.get("/login", function (request, response) {
     ""
   );
   response.send(html);
+});
+
+router.post("/login_process", function (request, response) {
+  var post = request.body;
+  var email = post.email;
+  var password = post.pwd;
+  if (email === authData.email && password === authData.password) {
+    response.send("welcome");
+  } else {
+    response.send("Who?");
+  }
 });
 
 /*
