@@ -13,6 +13,8 @@ http
         "hello=world",
         "welcome_to=nodejs",
         `Permanent=cookies; Max-Age=${60 * 60 * 24 * 30}`,
+        "Secure=Secure; Secure",
+        "HttpOnly=HttpOnly; HttpOnly",
       ],
     });
     response.end("Cookie!");
