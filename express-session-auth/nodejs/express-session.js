@@ -1,6 +1,7 @@
 var express = require("express");
 var parseurl = require("parseurl");
 var session = require("express-session");
+var FileStore = require("session-file-store")(session);
 
 var app = express();
 
@@ -9,6 +10,7 @@ app.use(
     secret: "keyboard cat",
     resave: false,
     saveUninitialized: true,
+    store: new FileStore(),
   })
 );
 
