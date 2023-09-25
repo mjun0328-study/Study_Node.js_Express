@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 var path = require("path");
 var fs = require("fs");
-var sanitizeHtml = require("sanitize-html");
 var template = require("../lib/template.js");
 
 var authData = {
@@ -38,10 +37,16 @@ router.post("/login_process", function (request, response) {
   if (email === authData.email && password === authData.password) {
     request.session.is_logined = true;
     request.session.nickname = authData.nickname;
-    response.send("welcome");
+    response.send("Welcome");
   } else {
     response.send("Who?");
   }
+});
+
+router.get("/logout", function (request, response) {
+  request.session.destroy(function () {
+    response.redirect("/");
+  });
 });
 
 /*
