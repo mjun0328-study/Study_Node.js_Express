@@ -8,9 +8,13 @@ http
       cookies = cookie.parse(request.headers.cookie);
     }
     console.log(cookies);
-    // response.writeHead(200, {
-    //   "Set-Cookie": ["hello=world", "welcome_to=nodejs"],
-    // });
+    response.writeHead(200, {
+      "Set-Cookie": [
+        "hello=world",
+        "welcome_to=nodejs",
+        `Permanent=cookies; Max-Age=${60 * 60 * 24 * 30}`,
+      ],
+    });
     response.end("Cookie!");
   })
   .listen(3000);
