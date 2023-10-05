@@ -12,11 +12,9 @@ Node.js & Express 활용 스터디
 
 - Session & Auth
 
-- Passport.js
-
 ---
 
-23.9.1. ~
+23.9.1. ~ 26.
 
 https://opentutorials.org/module/3549
 
@@ -27,5 +25,3 @@ https://opentutorials.org/course/3347
 https://opentutorials.org/course/3387
 
 https://opentutorials.org/course/3400
-
-https://opentutorials.org/course/3402
